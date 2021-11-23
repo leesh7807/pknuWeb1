@@ -1,169 +1,331 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8" />
-    <title>°ø°øµ¥ÀÌÅÍ + Ä«Ä«¿À¸ÊAPI</title>
-  </head>
-  <body>
-    <select id="area" onchange="classifyMarkers()">
-      <option value="Àü±¹">Àü±¹</option>
-      <option value="¼­¿ïÆ¯º°½Ã">¼­¿ï</option>
-      <option value="ºÎ»ê±¤¿ª½Ã">ºÎ»ê</option>
-      <option value="´ë±¸±¤¿ª½Ã">´ë±¸</option>
-      <option value="ÀÎÃµ±¤¿ª½Ã">ÀÎÃµ</option>
-      <option value="±¤ÁÖ±¤¿ª½Ã">±¤ÁÖ</option>
-      <option value="´ëÀü±¤¿ª½Ã">´ëÀü</option>
-      <option value="¿ï»ê±¤¿ª½Ã">¿ï»ê</option>
-      <option value="¼¼Á¾Æ¯º°ÀÚÄ¡½Ã">¼¼Á¾</option>
-      <option value="°æ±âµµ">°æ±â</option>
-      <option value="°­¿øµµ">°­¿ø</option>
-      <option value="ÃæÃ»ºÏµµ">ÃæºÏ</option>
-      <option value="ÃæÃ»³²µµ">Ãæ³²</option>
-      <option value="Àü¶óºÏµµ">ÀüºÏ</option>
-      <option value="Àü¶ó³²µµ">Àü³²</option>
-      <option value="°æ»óºÏµµ">°æºÏ</option>
-      <option value="°æ»ó³²µµ">°æ³²</option>
-      <option value="Á¦ÁÖÆ¯º°ÀÚÄ¡µµ">Á¦ÁÖ</option>
-    </select>
-    <select id="type" onchange="classifyMarkers()">
-      <option value="ÀüÃ¼">ÀüÃ¼</option>
-      <option value="Àú¼öÁö">Àú¼öÁö</option>
-      <option value="¹Ù´Ù">¹Ù´Ù</option>
-      <option value="ÆòÁö">ÆòÁö</option>
-      <option value="±âÅ¸">±âÅ¸</option>
-    </select>
-    <div id="map" style="width: 100%; height: 100vh"></div>
-    <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=¼­ºñ½ºÅ°&libraries=clusterer"></script>
-    <script>
+
+<head>
+  <meta charset="utf-8" />
+  <title>ê³µê³µë°ì´í„° + ì¹´ì¹´ì˜¤ë§µAPI</title>
+  <style>
+    /* ì¹´í…Œê³ ë¦¬ */
+    #area {
+      position: absolute;
+      top: 10px;
+      left: 15px;
+      z-index: 1;
+    }
+
+    #type {
+      position: absolute;
+      top: 10px;
+      left: 80px;
+      z-index: 1;
+    }
+
+    /* ì¸í¬ìœˆë„ìš° */
+    .wrap {
+      width: 288px;
+      height: 132px;
+      text-align: left;
+      overflow: hidden;
+      font-size: 12px;
+      font-family: "Malgun Gothic", dotum, "ë‹ì›€", sans-serif;
+      line-height: 1.5;
+    }
+
+    .wrap * {
+      padding: 0;
+      margin: 0;
+    }
+
+    .wrap .title {
+      padding: 5px 0 0 10px;
+      height: 30px;
+      background: #eee;
+      border-bottom: 1px solid #ddd;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .wrap .body {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .wrap .desc {
+      position: relative;
+      margin: 13px 0 0 10px;
+      height: 75px;
+    }
+
+    .desc .ellipsis {
+      overflow: hidden;
+      /* text-overflow: ellipsis;
+      white-space: nowrap; */
+    }
+
+    .desc .jibun {
+      font-size: 11px;
+      color: #888;
+      margin-top: -2px;
+    }
+
+    .wrap .link {
+      color: #5085bb;
+    }
+
+    /* ìƒì„¸ì •ë³´ì°½ */
+    #detailInformation {
+      width: 300px;
+      height: 100%;
+      position: absolute;
+      right: 0;
+      top: 0;
+      background: ivory;
+      z-index: 1;
+    }
+
+    #detailInformation #weather {
+      height: 25%;
+      background: lawngreen;
+    }
+
+    #detailInformation #center_name {
+      height: 15%;
+      background: darkcyan;
+      color: white;
+    }
+
+    #detailInformation #center_address {
+      height: 20%;
+      background: brown;
+      color: white;
+    }
+
+    #detailInformation #center_callNumber {
+      height: 10%;
+      background: cornflowerblue;
+      color: white;
+    }
+
+    #detailInformation #center_cost {
+      height: 10%;
+      background: darkgray;
+      color: white;
+    }
+
+    #detailInformation #center_fishSpecies {
+      height: 10%;
+      background: darkslateblue;
+      color: white;
+    }
+
+    #detailInformation #center_safetyFacilities {
+      height: 10%;
+      background: darkslategray;
+      color: white;
+    }
+  </style>
+</head>
+
+<body>
+  <select id="area" onchange="classifyMarkers()">
+    <option value="ì „êµ­">ì „êµ­</option>
+    <option value="ì„œìš¸íŠ¹ë³„ì‹œ">ì„œìš¸</option>
+    <option value="ë¶€ì‚°ê´‘ì—­ì‹œ">ë¶€ì‚°</option>
+    <option value="ëŒ€êµ¬ê´‘ì—­ì‹œ">ëŒ€êµ¬</option>
+    <option value="ì¸ì²œê´‘ì—­ì‹œ">ì¸ì²œ</option>
+    <option value="ê´‘ì£¼ê´‘ì—­ì‹œ">ê´‘ì£¼</option>
+    <option value="ëŒ€ì „ê´‘ì—­ì‹œ">ëŒ€ì „</option>
+    <option value="ìš¸ì‚°ê´‘ì—­ì‹œ">ìš¸ì‚°</option>
+    <option value="ì„¸ì¢…íŠ¹ë³„ìì¹˜ì‹œ">ì„¸ì¢…</option>
+    <option value="ê²½ê¸°ë„">ê²½ê¸°</option>
+    <option value="ê°•ì›ë„">ê°•ì›</option>
+    <option value="ì¶©ì²­ë¶ë„">ì¶©ë¶</option>
+    <option value="ì¶©ì²­ë‚¨ë„">ì¶©ë‚¨</option>
+    <option value="ì „ë¼ë¶ë„">ì „ë¶</option>
+    <option value="ì „ë¼ë‚¨ë„">ì „ë‚¨</option>
+    <option value="ê²½ìƒë¶ë„">ê²½ë¶</option>
+    <option value="ê²½ìƒë‚¨ë„">ê²½ë‚¨</option>
+    <option value="ì œì£¼íŠ¹ë³„ìì¹˜ë„">ì œì£¼</option>
+  </select>
+  <select id="type" onchange="classifyMarkers()">
+    <option value="ì „ì²´">ì „ì²´</option>
+    <option value="ì €ìˆ˜ì§€">ì €ìˆ˜ì§€</option>
+    <option value="ë°”ë‹¤">ë°”ë‹¤</option>
+    <option value="í‰ì§€">í‰ì§€</option>
+    <option value="ê¸°íƒ€">ê¸°íƒ€</option>
+  </select>
+  <div id="map" style="width: 100%; height: 100vh; z-index: 0;"></div>
+  <script
+    src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=[ì•±í‚¤]&libraries=clusterer"></script>
+  <script>
     var url = "http://api.data.go.kr/openapi/tn_pubr_public_fshlc_api";
-    var queryParams = '?' + encodeURIComponent('serviceKey') + '='+'°ø°øµ¥ÀÌÅÍÅ°'; /*Service Key*/
-        queryParams += '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent('1'); /**/
-        queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('707'); /**/
-        queryParams += '&' + encodeURIComponent('type') + '=' + encodeURIComponent('json'); /**/ 
-    var fishingPlace = new Array();
+    var queryParams = '?' + encodeURIComponent('serviceKey') + '=' + '[ì„œë¹„ìŠ¤í‚¤]'; /*Service Key*/
+    queryParams += '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent('1'); /**/
+    queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('707'); /**/
+    queryParams += '&' + encodeURIComponent('type') + '=' + encodeURIComponent('json'); /**/
+
     var markers = new Array();
-    // ÀÎÆ÷À©µµ¿ì Ç¥½Ã ¿­±â
+    // ì¸í¬ìœˆë„ìš° í‘œì‹œ ì—´ê¸°
+    // ë§ˆì»¤ ë§ˆìš°ìŠ¤ì˜¤ë²„ ì´ë²¤íŠ¸ë¦¬ìŠ¤ë„ˆ
     function mouseOverListener(map, marker, infoWindow) {
       return function () {
         infoWindow.open(map, marker);
       };
     }
-    // ÀÎÆ÷À©µµ¿ì Ç¥½Ã ´İ±â
+    // ì¸í¬ìœˆë„ìš° í‘œì‹œ ë‹«ê¸°
+    // ë§ˆì»¤ ë§ˆìš°ìŠ¤ì•„ì›ƒ ì´ë²¤íŠ¸ë¦¬ìŠ¤ë„ˆ
     function mouseOutListener(infoWindow) {
       return function () {
         infoWindow.close();
       };
     }
-    var mapContainer = document.getElementById("map"); // Áöµµ¸¦ Ç¥½ÃÇÒ div
+    // ìƒì„¸ì •ë³´ì°½ ì¶œë ¥
+    // ë§ˆì»¤ í´ë¦­ ì´ë²¤íŠ¸ë¦¬ìŠ¤ë„ˆ
+    function mouseClickListener(centers, i) { //ë§ˆì»¤ í´ë¦­ì´ë²¤íŠ¸ ë°œìƒ ì‹œ, ìƒì„¸ì •ë³´ ì¶œë ¥í•¨ìˆ˜ ë°˜í™˜
+      return function () {
+        var center_name = document.getElementById("center_name");
+        var center_address = document.getElementById("center_address");
+        var center_callNumber = document.getElementById("center_callNumber");
+        var center_cost = document.getElementById("center_cost");
+        var center_fishSpecies = document.getElementById("center_fishSpecies");
+        var center_safetyFacilities = document.getElementById("center_safetyFacilities");
+        center_name.innerHTML = "ë‚šì‹œí„°ëª…: " + centers[i]['fshlcNm'];
+        center_address.innerHTML = "ìƒì„¸ ì£¼ì†Œ<br>";
+        if (centers[i]['rdnmadr'] != "") center_address.innerHTML += "ë„ë¡œëª…ì£¼ì†Œ: " + centers[i]['rdnmadr'] + "<br>";
+        if (centers[i]['lnmadr'] != "") center_address.innerHTML += "ì§€ë²ˆì£¼ì†Œ: " + centers[i]['lnmadr'];
+        center_callNumber.innerHTML = "ì „í™”ë²ˆí˜¸: " + centers[i]['fshlcPhoneNumber'];
+        center_cost.innerHTML = "ì´ìš© ìš”ê¸ˆ: " + centers[i]['useCharge'];
+        center_fishSpecies.innerHTML = "ì£¼ìš” ì–´ì¢…: " + centers[i]['kdfsh'];
+        center_safetyFacilities.innerHTML = "ì•ˆì „ ì‹œì„¤: " + centers[i]['safentl'];
+      }
+    }
+    //ë§ˆì»¤ ê·¸ë¦¬ëŠ” í•¨ìˆ˜
+    function drawMarkers(centers) {
+      for (let i = 0; i < centers.length; i++) {
+        var latitude = centers[i]["latitude"];
+        var longitude = centers[i]["longitude"];
+        var marker = new kakao.maps.Marker({
+          position: new kakao.maps.LatLng(latitude, longitude),
+          map: map,
+        });
+
+        // ì¸í¬ìœˆë„ìš° ì„¤ì •
+        var infoWindow = new kakao.maps.InfoWindow({
+          content: infoWindowContent(centers, i)
+        });
+        // ë§ˆì»¤ ì¶”ê°€
+        markers.push(marker);
+        // ë§ˆì»¤ ì´ë²¤íŠ¸ë¦¬ìŠ¤ë„ˆ ë“±ë¡
+        kakao.maps.event.addListener(
+          marker,
+          "mouseover",
+          mouseOverListener(map, marker, infoWindow)
+        );
+        kakao.maps.event.addListener(
+          marker,
+          "mouseout",
+          mouseOutListener(infoWindow)
+        );
+
+        kakao.maps.event.addListener(marker, 'click', mouseClickListener(centers, i));
+      }
+    }
+
+    //ì¸í¬ìœˆë„ìš° content ë°˜í™˜í•¨ìˆ˜
+    function infoWindowContent(centers, i) {
+      var contentAddress = "";
+      if (centers[i]['rdnmadr'] != "" && centers[i]['rdnmadr'] != null) contentAddress += "ë„ë¡œëª…ì£¼ì†Œ: " + centers[i]['rdnmadr'] + "<br>";
+      if (centers[i]['lnmadr'] != "" && centers[i]['lnmadr'] != null) contentAddress += "ì§€ë²ˆì£¼ì†Œ: " + centers[i]['lnmadr'];
+
+      var content =
+        '<div class="wrap">' +
+        '    <div class="title">ë‚šì‹œí„° ì •ë³´</div>' +
+        '    <div class="body">' +
+        '        <div class="desc">' +
+        '            <div class="ellipsis">' + centers[i]["fshlcNm"] + '</div>' +
+        '            <div class="jibun ellipsis">' + contentAddress + '</div>' +
+        '            <div class="jibun ellipsis">' + centers[i]["phoneNumber"] + '</div>'
+        "          </div>" +
+        "    </div>" +
+        "</div>";
+      return content;
+    }
+
+    var mapContainer = document.getElementById("map"); // ì§€ë„ë¥¼ í‘œì‹œí•  div
     var mapOption = {
-      center: new kakao.maps.LatLng(36.59000, 127.52855), // ÁöµµÀÇ Áß½ÉÁÂÇ¥
-      level: 12, // ÁöµµÀÇ È®´ë ·¹º§
+      center: new kakao.maps.LatLng(36.59000, 127.52855), // ì§€ë„ì˜ ì¤‘ì‹¬ì¢Œí‘œ
+      level: 12, // ì§€ë„ì˜ í™•ëŒ€ ë ˆë²¨
     };
     var map = new kakao.maps.Map(mapContainer, mapOption);
     var clusterer = new kakao.maps.MarkerClusterer({
-      map: map, // ¸¶Ä¿µéÀ» Å¬·¯½ºÅÍ·Î °ü¸®ÇÏ°í Ç¥½ÃÇÒ Áöµµ °´Ã¼
-      averageCenter: true, // Å¬·¯½ºÅÍ¿¡ Æ÷ÇÔµÈ ¸¶Ä¿µéÀÇ Æò±Õ À§Ä¡¸¦ Å¬·¯½ºÅÍ ¸¶Ä¿ À§Ä¡·Î ¼³Á¤
-      minLevel: 5, // Å¬·¯½ºÅÍ ÇÒ ÃÖ¼Ò Áöµµ ·¹º§
+      map: map, // ë§ˆì»¤ë“¤ì„ í´ëŸ¬ìŠ¤í„°ë¡œ ê´€ë¦¬í•˜ê³  í‘œì‹œí•  ì§€ë„ ê°ì²´
+      averageCenter: true, // í´ëŸ¬ìŠ¤í„°ì— í¬í•¨ëœ ë§ˆì»¤ë“¤ì˜ í‰ê·  ìœ„ì¹˜ë¥¼ í´ëŸ¬ìŠ¤í„° ë§ˆì»¤ ìœ„ì¹˜ë¡œ ì„¤ì •
+      minLevel: 5, // í´ëŸ¬ìŠ¤í„° í•  ìµœì†Œ ì§€ë„ ë ˆë²¨
     });
+
+    var centers = []; //api ì •ë³´ë¥¼ ë‹´ì„ ë³€ìˆ˜
     fetch(url + queryParams)
       .then((res) => res.json())
       .then((resJson) => {
-        var centers = resJson.response.body.items;
-        fishingPlace = centers;
-        for (var i = 0; i < centers.length; i++) {
-          var latitude = centers[i]["latitude"];
-          var longitude = centers[i]["longitude"];
-          var marker = new kakao.maps.Marker({
-            position: new kakao.maps.LatLng(latitude, longitude),
-            map: map,
-          });
-
-          var infoWindow = new kakao.maps.InfoWindow({
-            content: centers[i]["fshlcNm"] + "<br>" + centers[i]["phoneNumber"]
-          });
-          // ¸¶Ä¿ Ãß°¡
-          markers.push(marker);
-          // ¸¶Ä¿ ÀÌº¥Æ®¸®½º³Ê µî·Ï
-          kakao.maps.event.addListener(
-            marker,
-            "mouseover",
-            mouseOverListener(map, marker, infoWindow)
-          );
-          kakao.maps.event.addListener(
-            marker,
-            "mouseout",
-            mouseOutListener(infoWindow)
-          );
-        }
+        centers = resJson.response.body.items;
+        drawMarkers(centers);
         clusterer.addMarkers(markers);
       });
 
-      // ºĞ·ù ÇÔ¼ö
-      function classifyMarkers(e) {
-        // ¼¿·ºÆ® ¹Ú½º¿¡¼­ id·Î value °¡Á®¿À±â.
-        var target = document.getElementById("area");
-        var areaValue = target.options[target.selectedIndex].value;
-        var target = document.getElementById("type");
-        var typeValue = target.options[target.selectedIndex].value;
-        var classifiedArea = new Array();
-        var classifiedFishingPlace = new Array(); // ºĞ·ùµÈ fishingPlace°¡ ÀúÀåµÉ json ¹è¿­.
-        // Àü±¹ÀÌ ¼±ÅÃµÉ ¶§
-        if(areaValue == "Àü±¹") {
-          classifiedArea = fishingPlace; // ºĞ·ùµÈ °ÍÀÌ °ğ fishingPlace.
-        }
-        // ±× ¿Ü Áö¿ª ¼±ÅÃ
-        else {
-          for(var i = 0; i < fishingPlace.length; i++) {
-            var area = fishingPlace[i]["lnmadr"]; // Áö¹øÁÖ¼Ò ¹Ş¾Æ¿À±â.
-            var splittedArea = area.split(" "); // ½ºÆäÀÌ½º¹Ù¸¦ ±âÁØÀ¸·Î ¹è¿­·Î ÀúÀå.
-            if(areaValue == splittedArea[0]) { // ¹è¿­ÀÇ Ã¹ ¿ä¼Ò´Â °ğ Áö¿ª¸í.
-              classifiedArea.push(fishingPlace[i]);
-            }
-          }
-        }
-        if(typeValue == "ÀüÃ¼") {
-          classifiedFishingPlace = classifiedArea; // Áö¿ªºĞ·ù µÈ °á°ú ±×´ë·Î
-        }
-        // ±× ¿Ü À¯Çü ¼±ÅÃ
-        else {
-          for(var i = 0; i < classifiedArea.length; i++) {
-            var type = classifiedArea[i]["fshlcType"]; // ³¬½ÃÅÍ À¯Çü ¹Ş¾Æ¿À±â.
-            var splittedType = type.split(" "); // ½ºÆäÀÌ½º¹Ù¸¦ ±âÁØÀ¸·Î ¹è¿­·Î ÀúÀå.
-            if(typeValue == splittedType[0]) { 
-              classifiedFishingPlace.push(classifiedArea[i]);
-            }
-          }
-        }
-        // ºĞ·ù¸¦ ¸¶Ä£ ÈÄ ¸¶Ä¿¸¦ ÃÊ±âÈ­ ½ÃÅ´.
-        clusterer.removeMarkers(markers);
-        markers = [];
-        // ¸¶Ä¿¸¦ ¸¸µé¾î ¹è¿­¿¡ ³Ö°í Áöµµ¿¡ Âï±â.
-        for(var i = 0; i < classifiedFishingPlace.length; i++) {
-          var latitude = classifiedFishingPlace[i]["latitude"];
-          var longitude = classifiedFishingPlace[i]["longitude"];
-          var marker = new kakao.maps.Marker({
-            position: new kakao.maps.LatLng(latitude, longitude),
-            map: map,
-          });
-          var infoWindow = new kakao.maps.InfoWindow({
-            content: classifiedFishingPlace[i]["fshlcNm"] + "<br>" + classifiedFishingPlace[i]["phoneNumber"]
-          });
-          // ¸¶Ä¿ Ãß°¡
-          markers.push(marker);
-          // ¸¶Ä¿ ÀÌº¥Æ®¸®½º³Ê µî·Ï
-          kakao.maps.event.addListener(
-            marker,
-            "mouseover",
-            mouseOverListener(map, marker, infoWindow)
-          );
-          kakao.maps.event.addListener(
-            marker,
-            "mouseout",
-            mouseOutListener(infoWindow)
-          );
-        }
-        clusterer.addMarkers(markers);
+    // ë¶„ë¥˜ í•¨ìˆ˜
+    function classifyMarkers(e) {
+      // ì…€ë ‰íŠ¸ ë°•ìŠ¤ì—ì„œ idë¡œ value ê°€ì ¸ì˜¤ê¸°.
+      var target = document.getElementById("area");
+      var areaValue = target.options[target.selectedIndex].value;
+      var target = document.getElementById("type");
+      var typeValue = target.options[target.selectedIndex].value;
+      var classifiedArea = new Array();
+      var classifiedFishingPlace = new Array(); // ë¶„ë¥˜ëœ fishingPlaceê°€ ì €ì¥ë  json ë°°ì—´.
+      // ì „êµ­ì´ ì„ íƒë  ë•Œ
+      if (areaValue == "ì „êµ­") {
+        classifiedArea = centers; // ë¶„ë¥˜ëœ ê²ƒì´ ê³§ fishingPlace.
       }
-    </script>
-  </body>
+      // ê·¸ ì™¸ ì§€ì—­ ì„ íƒ
+      else {
+        for (var i = 0; i < centers.length; i++) {
+          var area = centers[i]["lnmadr"]; // ì§€ë²ˆì£¼ì†Œ ë°›ì•„ì˜¤ê¸°.
+          var splittedArea = area.split(" "); // ìŠ¤í˜ì´ìŠ¤ë°”ë¥¼ ê¸°ì¤€ìœ¼ë¡œ ë°°ì—´ë¡œ ì €ì¥.
+          if (areaValue == splittedArea[0]) { // ë°°ì—´ì˜ ì²« ìš”ì†ŒëŠ” ê³§ ì§€ì—­ëª….
+            classifiedArea.push(centers[i]);
+          }
+        }
+      }
+      if (typeValue == "ì „ì²´") {
+        classifiedFishingPlace = classifiedArea; // ì§€ì—­ë¶„ë¥˜ ëœ ê²°ê³¼ ê·¸ëŒ€ë¡œ
+      }
+      // ê·¸ ì™¸ ìœ í˜• ì„ íƒ
+      else {
+        for (var i = 0; i < classifiedArea.length; i++) {
+          var type = classifiedArea[i]["fshlcType"]; // ë‚šì‹œí„° ìœ í˜• ë°›ì•„ì˜¤ê¸°.
+          var splittedType = type.split(" "); // ìŠ¤í˜ì´ìŠ¤ë°”ë¥¼ ê¸°ì¤€ìœ¼ë¡œ ë°°ì—´ë¡œ ì €ì¥.
+          if (typeValue == splittedType[0]) {
+            classifiedFishingPlace.push(classifiedArea[i]);
+          }
+        }
+      }
+      // ë¶„ë¥˜ë¥¼ ë§ˆì¹œ í›„ ë§ˆì»¤ë¥¼ ì´ˆê¸°í™” ì‹œí‚´.
+      clusterer.removeMarkers(markers);
+      markers = [];
+      // ë§ˆì»¤ë¥¼ ë§Œë“¤ì–´ ë°°ì—´ì— ë„£ê³  ì§€ë„ì— ì°ê¸°.
+      drawMarkers(classifiedFishingPlace);
+
+      clusterer.addMarkers(markers);
+    }
+  </script>
+  <aside id="detailInformation">
+    <div id="weather">ë‚ ì”¨</div>
+    <div id="center_name">ë‚šì‹œí„°ëª…</div>
+    <div id="center_address">ìƒì„¸ ì£¼ì†Œ</div>
+    <div id="center_callNumber">ì „í™”ë²ˆí˜¸</div>
+    <div id="center_cost">ì´ìš© ìš”ê¸ˆ</div>
+    <div id="center_fishSpecies">ì£¼ìš” ì–´ì¢…</div>
+    <div id="center_safetyFacilities">ì•ˆì „ ì‹œì„¤</div>
+  </aside>
+</body>
+
 </html>
