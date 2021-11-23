@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <title>공공데이터 + 카카오맵API</title>
+  <style>
+    /* 카테고리 */
+    #area {
+      position: absolute;
+      top: 10px;
+      left: 15px;
+      z-index: 1;
+    }
+
+    #type {
+      position: absolute;
+      top: 10px;
+      left: 80px;
+      z-index: 1;
+    }
+
+    /* 인포윈도우 */
+    .wrap {
+      width: 288px;
+      height: 132px;
+      text-align: left;
+      overflow: hidden;
+      font-size: 12px;
+      font-family: "Malgun Gothic", dotum, "돋움", sans-serif;
+      line-height: 1.5;
+    }
+
+    .wrap * {
+      padding: 0;
+      margin: 0;
+    }
+
+    .wrap .title {
+      padding: 5px 0 0 10px;
+      height: 30px;
+      background: #eee;
+      border-bottom: 1px solid #ddd;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .wrap .body {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .wrap .desc {
+      position: relative;
+      margin: 13px 0 0 10px;
+      height: 75px;
+    }
+
+    .desc .ellipsis {
+      overflow: hidden;
+      /* text-overflow: ellipsis;
+      white-space: nowrap; */
+    }
+
+    .desc .jibun {
+      font-size: 11px;
+      color: #888;
+      margin-top: -2px;
+    }
+
+    .wrap .link {
+      color: #5085bb;
+    }
+
+    /* 상세정보창 */
+    #detailInformation {
+      width: 300px;
+      height: 100%;
+      position: absolute;
+      right: 0;
+      top: 0;
+      background: ivory;
+      z-index: 1;
+    }
+
+    #detailInformation #weather {
+      height: 25%;
+      background: lawngreen;
+    }
+
+    #detailInformation #center_name {
+      height: 15%;
+      background: darkcyan;
+      color: white;
+    }
+
+    #detailInformation #center_address {
+      height: 20%;
+      background: brown;
+      color: white;
+    }
+
+    #detailInformation #center_callNumber {
+      height: 10%;
+      background: cornflowerblue;
+      color: white;
+    }
+
+    #detailInformation #center_cost {
+      height: 10%;
+      background: darkgray;
+      color: white;
+    }
+
+    #detailInformation #center_fishSpecies {
+      height: 10%;
+      background: darkslateblue;
+      color: white;
+    }
+
+    #detailInformation #center_safetyFacilities {
+      height: 10%;
+      background: darkslategray;
+      color: white;
+    }
+  </style>
+</head>
+
+<body>
+  <select id="area" onchange="classifyMarkers()">
+    <option value="전국">전국</option>
+    <option value="서울특별시">서울</option>
+    <option value="부산광역시">부산</option>
+    <option value="대구광역시">대구</option>
+    <option value="인천광역시">인천</option>
+    <option value="광주광역시">광주</option>
+    <option value="대전광역시">대전</option>
+    <option value="울산광역시">울산</option>
+    <option value="세종특별자치시">세종</option>
+    <option value="경기도">경기</option>
+    <option value="강원도">강원</option>
+    <option value="충청북도">충북</option>
+    <option value="충청남도">충남</option>
+    <option value="전라북도">전북</option>
+    <option value="전라남도">전남</option>
+    <option value="경상북도">경북</option>
+    <option value="경상남도">경남</option>
+    <option value="제주특별자치도">제주</option>
+  </select>
+  <select id="type" onchange="classifyMarkers()">
+    <option value="전체">전체</option>
+    <option value="저수지">저수지</option>
+    <option value="바다">바다</option>
+    <option value="평지">평지</option>
+    <option value="기타">기타</option>
+  </select>
+  <div id="map" style="width: 100%; height: 100vh; z-index: 0;"></div>
+  <script
+    src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=eb92c4cb1ef08334d28cb57b27ae3ab2&libraries=clusterer"></script>
+  <script>
+    var url = "http://api.data.go.kr/openapi/tn_pubr_public_fshlc_api";
+    var queryParams = '?' + encodeURIComponent('serviceKey') + '=' + 'lS7kyucGJY1fq8UGLsP3lXJl%2FZlbc8i5ObPO9O5OHlmIjIfH9hSwPGROViGfC5rpa5KfdTDJheDcrc6lGYRw0A%3D%3D'; /*Service Key*/
+    queryParams += '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent('1'); /**/
+    queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('707'); /**/
+    queryParams += '&' + encodeURIComponent('type') + '=' + encodeURIComponent('json'); /**/
+
+    var markers = new Array();
+    // 인포윈도우 표시 열기
+    // 마커 마우스오버 이벤트리스너
+    function mouseOverListener(map, marker, infoWindow) {
+      return function () {
+        infoWindow.open(map, marker);
+      };
+    }
+    // 인포윈도우 표시 닫기
+    // 마커 마우스아웃 이벤트리스너
+    function mouseOutListener(infoWindow) {
+      return function () {
+        infoWindow.close();
+      };
+    }
+    // 상세정보창 출력
+    // 마커 클릭 이벤트리스너
+    function mouseClickListener(centers, i) { //마커 클릭이벤트 발생 시, 상세정보 출력함수 반환
+      return function () {
+        var center_name = document.getElementById("center_name");
+        var center_address = document.getElementById("center_address");
+        var center_callNumber = document.getElementById("center_callNumber");
+        var center_cost = document.getElementById("center_cost");
+        var center_fishSpecies = document.getElementById("center_fishSpecies");
+        var center_safetyFacilities = document.getElementById("center_safetyFacilities");
+        center_name.innerHTML = "낚시터명: " + centers[i]['fshlcNm'];
+        center_address.innerHTML = "상세 주소<br>";
+        if (centers[i]['rdnmadr'] != "") center_address.innerHTML += "도로명주소: " + centers[i]['rdnmadr'] + "<br>";
+        if (centers[i]['lnmadr'] != "") center_address.innerHTML += "지번주소: " + centers[i]['lnmadr'];
+        center_callNumber.innerHTML = "전화번호: " + centers[i]['fshlcPhoneNumber'];
+        center_cost.innerHTML = "이용 요금: " + centers[i]['useCharge'];
+        center_fishSpecies.innerHTML = "주요 어종: " + centers[i]['kdfsh'];
+        center_safetyFacilities.innerHTML = "안전 시설: " + centers[i]['safentl'];
+      }
+    }
+    //마커 그리는 함수
+    function drawMarkers(centers) {
+      for (let i = 0; i < centers.length; i++) {
+        var latitude = centers[i]["latitude"];
+        var longitude = centers[i]["longitude"];
+        var marker = new kakao.maps.Marker({
+          position: new kakao.maps.LatLng(latitude, longitude),
+          map: map,
+        });
+
+        // 인포윈도우 설정
+        var infoWindow = new kakao.maps.InfoWindow({
+          content: infoWindowContent(centers, i)
+        });
+        // 마커 추가
+        markers.push(marker);
+        // 마커 이벤트리스너 등록
+        kakao.maps.event.addListener(
+          marker,
+          "mouseover",
+          mouseOverListener(map, marker, infoWindow)
+        );
+        kakao.maps.event.addListener(
+          marker,
+          "mouseout",
+          mouseOutListener(infoWindow)
+        );
+
+        kakao.maps.event.addListener(marker, 'click', mouseClickListener(centers, i));
+      }
+    }
+
+    //인포윈도우 content 반환함수
+    function infoWindowContent(centers, i) {
+      var contentAddress = "";
+      if (centers[i]['rdnmadr'] != "" && centers[i]['rdnmadr'] != null) contentAddress += "도로명주소: " + centers[i]['rdnmadr'] + "<br>";
+      if (centers[i]['lnmadr'] != "" && centers[i]['lnmadr'] != null) contentAddress += "지번주소: " + centers[i]['lnmadr'];
+
+      var content =
+        '<div class="wrap">' +
+        '    <div class="title">낚시터 정보</div>' +
+        '    <div class="body">' +
+        '        <div class="desc">' +
+        '            <div class="ellipsis">' + centers[i]["fshlcNm"] + '</div>' +
+        '            <div class="jibun ellipsis">' + contentAddress + '</div>' +
+        '            <div class="jibun ellipsis">' + centers[i]["phoneNumber"] + '</div>'
+        "          </div>" +
+        "    </div>" +
+        "</div>";
+      return content;
+    }
+
+    var mapContainer = document.getElementById("map"); // 지도를 표시할 div
+    var mapOption = {
+      center: new kakao.maps.LatLng(36.59000, 127.52855), // 지도의 중심좌표
+      level: 12, // 지도의 확대 레벨
+    };
+    var map = new kakao.maps.Map(mapContainer, mapOption);
+    var clusterer = new kakao.maps.MarkerClusterer({
+      map: map, // 마커들을 클러스터로 관리하고 표시할 지도 객체
+      averageCenter: true, // 클러스터에 포함된 마커들의 평균 위치를 클러스터 마커 위치로 설정
+      minLevel: 5, // 클러스터 할 최소 지도 레벨
+    });
+
+    var centers = []; //api 정보를 담을 변수
+    fetch(url + queryParams)
+      .then((res) => res.json())
+      .then((resJson) => {
+        centers = resJson.response.body.items;
+        drawMarkers(centers);
+        clusterer.addMarkers(markers);
+      });
+
+    // 분류 함수
+    function classifyMarkers(e) {
+      // 셀렉트 박스에서 id로 value 가져오기.
+      var target = document.getElementById("area");
+      var areaValue = target.options[target.selectedIndex].value;
+      var target = document.getElementById("type");
+      var typeValue = target.options[target.selectedIndex].value;
+      var classifiedArea = new Array();
+      var classifiedFishingPlace = new Array(); // 분류된 fishingPlace가 저장될 json 배열.
+      // 전국이 선택될 때
+      if (areaValue == "전국") {
+        classifiedArea = centers; // 분류된 것이 곧 fishingPlace.
+      }
+      // 그 외 지역 선택
+      else {
+        for (var i = 0; i < centers.length; i++) {
+          var area = centers[i]["lnmadr"]; // 지번주소 받아오기.
+          var splittedArea = area.split(" "); // 스페이스바를 기준으로 배열로 저장.
+          if (areaValue == splittedArea[0]) { // 배열의 첫 요소는 곧 지역명.
+            classifiedArea.push(centers[i]);
+          }
+        }
+      }
+      if (typeValue == "전체") {
+        classifiedFishingPlace = classifiedArea; // 지역분류 된 결과 그대로
+      }
+      // 그 외 유형 선택
+      else {
+        for (var i = 0; i < classifiedArea.length; i++) {
+          var type = classifiedArea[i]["fshlcType"]; // 낚시터 유형 받아오기.
+          var splittedType = type.split(" "); // 스페이스바를 기준으로 배열로 저장.
+          if (typeValue == splittedType[0]) {
+            classifiedFishingPlace.push(classifiedArea[i]);
+          }
+        }
+      }
+      // 분류를 마친 후 마커를 초기화 시킴.
+      clusterer.removeMarkers(markers);
+      markers = [];
+      // 마커를 만들어 배열에 넣고 지도에 찍기.
+      drawMarkers(classifiedFishingPlace);
+
+      clusterer.addMarkers(markers);
+    }
+  </script>
+  <aside id="detailInformation">
+    <div id="weather">날씨</div>
+    <div id="center_name">낚시터명</div>
+    <div id="center_address">상세 주소</div>
+    <div id="center_callNumber">전화번호</div>
+    <div id="center_cost">이용 요금</div>
+    <div id="center_fishSpecies">주요 어종</div>
+    <div id="center_safetyFacilities">안전 시설</div>
+  </aside>
+</body>
+
+</html>
