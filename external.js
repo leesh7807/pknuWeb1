@@ -1,5 +1,5 @@
 var url = "http://api.data.go.kr/openapi/tn_pubr_public_fshlc_api";
-    var queryParams = '?' + encodeURIComponent('serviceKey') + '=' + 'VQI%2FZ6eCYALAdsmZKMBlMGClkZXODw%2B8%2BUOlNHW0zPFH48JUZ5JtrReBZqbOX3Bk7BZE4pOJjKOeRaMTWpmEUg%3D%3D'; /*Service Key*/
+    var queryParams = '?' + encodeURIComponent('serviceKey') + '=' + '[서비스키]'; /*Service Key*/
     queryParams += '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent('1'); /**/
     queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('707'); /**/
     queryParams += '&' + encodeURIComponent('type') + '=' + encodeURIComponent('json'); /**/
