@@ -84,7 +84,7 @@ var url = "http://api.data.go.kr/openapi/tn_pubr_public_fshlc_api";
         '        <div class="desc">' +
         '            <div class="ellipsis">' + centers[i]["fshlcNm"] + '</div>' +
         '            <div class="jibun ellipsis">' + contentAddress + '</div>' +
-        '            <div class="jibun ellipsis">' + centers[i]["phoneNumber"] + '</div>'
+        '            <div class="jibun ellipsis">' + centers[i]["fshlcPhoneNumber"] + '</div>'
         "          </div>" +
         "    </div>" +
         "</div>";
@@ -97,6 +97,14 @@ var url = "http://api.data.go.kr/openapi/tn_pubr_public_fshlc_api";
       level: 12, // 지도의 확대 레벨
     };
     var map = new kakao.maps.Map(mapContainer, mapOption);
+    map.setMaxLevel(13); // 이게 최대로 축소할 수 있는 크기
+      var zoomControl = new kakao.maps.ZoomControl();
+      map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
+      kakao.maps.event.addListener(map, "zoom_changed", function () {
+        var level = map.getLevel();
+        if (level == 13) map.setDraggable(false);
+        else map.setDraggable(true);
+      });
     var clusterer = new kakao.maps.MarkerClusterer({
       map: map, // 마커들을 클러스터로 관리하고 표시할 지도 객체
       averageCenter: true, // 클러스터에 포함된 마커들의 평균 위치를 클러스터 마커 위치로 설정
