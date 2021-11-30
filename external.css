@@ -13,6 +13,13 @@
   z-index: 1;
 }
 
+#searchBox {
+  position: absolute;
+  top: 10px;
+  left: 160px;
+  z-index: 1;
+}
+
 /* 인포윈도우 */
 .wrap {
   width: 288px;
