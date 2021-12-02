@@ -1,63 +1,118 @@
-details {
-  border: 2px solid skyblue;
-  padding: 10px;
-  color: #0080ff;
-  background: aliceblue;
+/* 카테고리 */
+#area {
+  position: absolute;
+  top: 10px;
+  left: 15px;
+  z-index: 1;
 }
 
-summary {
-  border: 2px solid red;
-  color: beige;
-  background: pink;
-}
-ol {
-  background: greenyellow;
-  list-style-type: upper-roman;
+#type {
+  position: absolute;
+  top: 10px;
+  left: 80px;
+  z-index: 1;
 }
 
-ul {
-  background: rosybrown;
-  list-style-type: lower-alpha;
-}
-
-.p1 {
-  text-indent: 1em;
-}
-#up:hover {
-  position: relative;
-  right: 20px;
-  bottom: 20px;
-}
-#down:hover {
-  position: relative;
-  left: 20px;
-  top: 20px;
-}
-
-#menu {
-  height: 30px;
-  width: 840px;
-}
-
-#menu ul li {
-  list-style: none;
-  color: white;
-  background-color: #2d2d2d;
-  float: left;
-  line-height: 30px;
-  vertical-align: middle;
-  text-align: center;
-}
-#menu .menulink {
-  text-decoration: none;
-  color: white;
-  display: block;
-  width: 150px;
+/* 인포윈도우 */
+.wrap {
+  width: 288px;
+  height: 132px;
+  text-align: left;
+  overflow: hidden;
   font-size: 12px;
+  font-family: "Malgun Gothic", dotum, "돋움", sans-serif;
+  line-height: 1.5;
+}
+
+.wrap * {
+  padding: 0;
+  margin: 0;
+}
+
+.wrap .title {
+  padding: 5px 0 0 10px;
+  height: 30px;
+  background: #eee;
+  border-bottom: 1px solid #ddd;
+  font-size: 18px;
   font-weight: bold;
 }
 
-#menu .menulink:hover {
-  color: blueviolet;
-  background-color: #4d4d4d;
+.wrap .body {
+  position: relative;
+  overflow: hidden;
+}
+
+.wrap .desc {
+  position: relative;
+  margin: 13px 0 0 10px;
+  height: 75px;
+}
+
+.desc .ellipsis {
+  overflow: hidden;
+  /* text-overflow: ellipsis;
+  white-space: nowrap; */
+}
+
+.desc .jibun {
+  font-size: 11px;
+  color: #888;
+  margin-top: -2px;
+}
+
+.wrap .link {
+  color: #5085bb;
+}
+
+/* 상세정보창 */
+#detailInformation {
+  width: 300px;
+  height: 100%;
+  position: absolute;
+  right: 0;
+  top: 100;
+  background: ivory;
+  z-index: 1;
+}
+
+#detailInformation #weather {
+  height: 15%;
+  background: lawngreen;
+}
+
+#detailInformation #center_name {
+  height: 10%;
+  background: darkcyan;
+  color: white;
+}
+
+#detailInformation #center_address {
+  height: 15%;
+  background: brown;
+  color: white;
+}
+
+#detailInformation #center_callNumber {
+  height: 5%;
+  background: cornflowerblue;
+  color: white;
+}
+
+#detailInformation #center_cost {
+  height: 5%;
+  background: darkgray;
+  color: white;
+}
+
+#detailInformation #center_fishSpecies {
+  height: 5%;
+  background: darkslateblue;
+  color: white;
+}
+
+#detailInformation #center_safetyFacilities {
+  height: 5%;
+  background: darkslategray;
+  color: rgb(229, 188, 188);
 }
