@@ -1,5 +1,5 @@
 var url = "http://api.data.go.kr/openapi/tn_pubr_public_fshlc_api";
-var queryParams = '?' + encodeURIComponent('serviceKey') + '=' + '[서비스키]]'; /*Service Key*/
+var queryParams = '?' + encodeURIComponent('serviceKey') + '=' + '[서비스키]'; /*Service Key*/
 queryParams += '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent('1'); /**/
 queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('707'); /**/
 queryParams += '&' + encodeURIComponent('type') + '=' + encodeURIComponent('json'); /**/
@@ -81,9 +81,10 @@ function makeMarkers(centers) {
 //인포윈도우 content 반환함수
 function infoWindowContent(centers, i) {
   var contentAddress = "";
+  var contentNumbers = "";
   if (centers[i]['rdnmadr'] != "" && centers[i]['rdnmadr'] != null) contentAddress += "도로명주소: " + centers[i]['rdnmadr'] + "<br>";
   if (centers[i]['lnmadr'] != "" && centers[i]['lnmadr'] != null) contentAddress += "지번주소: " + centers[i]['lnmadr'];
-
+  if (centers[i]["fshlcPhoneNumber"] != "" && centers[i]["fshlcPhoneNumber"] != null) contentNumbers
   var content =
     '<div class="wrap">' +
     '    <div class="title">낚시터 정보</div>' +
@@ -99,22 +100,19 @@ function infoWindowContent(centers, i) {
 }
 
 ///////////////////////////////////////////////////////
-//현재 오류있음 마커 뜬 이후에 위치정보수정하면 반영안됨
-var gpsAllow; //GPS 사용가능 여부를 저장할 변수
+// gps
+var gpsAllow = false; //GPS 사용가능 여부를 저장할 변수
 var currentLat = 37.541; //현재 위도 정보를 저장할 변수 (초기값: 서울)
 var currentLng = 126.986; //현재 경도 정보를 저장할 변수 (초기값: 서울)
 
-//현재 위치 정보를 받아오는 함수
+// 현재 위치 정보를 받아오는 함수
 function getLocation() {
   if (navigator.geolocation) { //GPS 사용가능시 호출
-    navigator.geolocation.getCurrentPosition(getLocationSuccess, getLocationFail);////////////////이벤트형식?
-  } else { //GPS 사용불가시 호출
-    alert('[경고]\n위치 정보를 받아오는 데 실패하였습니다.\n서울을 기준으로 한 지도를 표출합니다.');
-    gpsAllow = false; //GPS 사용 불가능
-  }
+    navigator.geolocation.getCurrentPosition(getLocationSuccess);
+  } 
 }
 
-//위치 정보 접근 성공시 실행
+// 위치 정보 접근 성공시 실행
 function getLocationSuccess(position) {
   //위치 정보 얻어오기 성공
   //현재 위치 정보를 저장
@@ -123,30 +121,7 @@ function getLocationSuccess(position) {
   gpsAllow = true; //GPS 사용 가능
 }
 
-//위치 정보 접근중 오류 발생시 실행
-function getLocationFail(error) {
-  switch (error.code) {
-    case 1: //사용자가 접근거부
-      alert("[경고]\n위치 정보 수집을 거절하셨습니다.\n서울을 기준으로 한 지도를 표출합니다.");
-      break;
-    case 2: //위치정보 사용불가
-      alert("[경고]\n위치 정보를 받아오는 데 실패하였습니다.\n서울을 기준으로 한 지도를 표출합니다.");
-      break;
-    case 3: //시간초과
-      alert("[경고]\n사용자 입력 시간 초과입니다.\n서울을 기준으로 한 지도를 표출합니다.");
-      break;
-  }
-  gpsAllow = false; //GPS 사용 불가능
-}
-
 getLocation();
-
-//gps 버튼
-function gpsButton(){ 
-  // if(gpsAllow == false) getLocation(); //작동 어떻게 할지?////////////////////////
-  map.panTo(new kakao.maps.LatLng(currentLat, currentLng)); //현재 위치로 지도 중심좌표 이동
-}
-
 /////////////////////////////////////////////////////////////////////////
 
 //로딩창
@@ -237,8 +212,6 @@ function classifyMarkers() {
       }
     }
   }
-
-  // moveArea(areaValue); // 현재 지역으로 지도 옮김
 
   // 분류를 마친 후 기존 마커 삭제 및 초기화
   clusterer.removeMarkers(markers);

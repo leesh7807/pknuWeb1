@@ -15,8 +15,8 @@ body {
 #loading_page::after { /* 투명도 부여를 위한 가상요소 생성 */
   background: gray;
   content: ""; /* 가상요소 생성시 필수 속성*/ 
-    /* 가상 요소가 원본의 전체를 차지하도록 위치를 설정 합니다 */
-    position: absolute;  /* 태그 박스의 배치를 'absolute'(절대 배치)로 지정합니다. */
+    /* 가상 요소가 원본의 전체를 차지하도록 위치를 설정 */
+    position: absolute;  /* 태그 박스의 배치를 'absolute'(절대 배치)로 지정 */
     /* 원본의 좌측 상단 끝 모서리부터 가상 요소가 시작 */
     top: 0; 
     left: 0; 
@@ -69,16 +69,6 @@ body {
   left: 50%;
   transform: translate(-50%, -50%);
   animation: text 1s infinite linear;
-}
-
-/* gps 버튼 */
-#gpsButton {
-  width: 30px;
-  height: 30px;
-  position: absolute;
-  bottom: 10px;
-  left: 15px;
-  z-index: 1;
 }
 
 /* 카테고리 */
