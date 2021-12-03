@@ -17,7 +17,7 @@ function mouseOverListener(map, marker, infoWindow) {
 // 마커 마우스아웃 이벤트리스너
 function mouseOutListener(infoWindow) {
   return function () {
-    infoWindow.close();
+    //infoWindow.close();
   };
 }
 // 상세정보창 출력
@@ -32,9 +32,11 @@ function mouseClickListener(centers, i) { //마커 클릭이벤트 발생 시, �
     var center_safetyFacilities = document.getElementById("center_safetyFacilities");
     center_name.innerHTML = "낚시터명: " + centers[i]['fshlcNm'];
     center_address.innerHTML = "상세 주소<br>";
-    if (centers[i]['rdnmadr'] != "") center_address.innerHTML += "도로명주소: " + centers[i]['rdnmadr'] + "<br>";
-    if (centers[i]['lnmadr'] != "") center_address.innerHTML += "지번주소: " + centers[i]['lnmadr'];
-    center_callNumber.innerHTML = "전화번호: " + centers[i]['fshlcPhoneNumber'];
+    if (centers[i]['rdnmadr'] != "" && centers[i]['rdnmadr'] != "null") center_address.innerHTML += "도로명주소: " + centers[i]['rdnmadr'] + "<br>";
+    if (centers[i]['lnmadr'] != "" && centers[i]['lnmadr'] != "null") center_address.innerHTML += "지번주소: " + centers[i]['lnmadr'];
+    center_callNumber.innerHTML = "전화번호: ";
+    if (centers[i]['lnmadr'] != "" && centers[i]['lnmadr'] != "null") center_callNumber.innerHTML += centers[i]['fshlcPhoneNumber'];
+    else center_callNumber.innerHTML += "정보없음";
     center_cost.innerHTML = "이용 요금: " + centers[i]['useCharge'];
     center_fishSpecies.innerHTML = "주요 어종: " + centers[i]['kdfsh'];
     center_safetyFacilities.innerHTML = "안전 시설: " + centers[i]['safentl'];
@@ -82,17 +84,17 @@ function makeMarkers(centers) {
 function infoWindowContent(centers, i) {
   var contentAddress = "";
   var contentNumbers = "";
-  if (centers[i]['rdnmadr'] != "" && centers[i]['rdnmadr'] != null) contentAddress += "도로명주소: " + centers[i]['rdnmadr'] + "<br>";
-  if (centers[i]['lnmadr'] != "" && centers[i]['lnmadr'] != null) contentAddress += "지번주소: " + centers[i]['lnmadr'];
-  if (centers[i]["fshlcPhoneNumber"] != "" && centers[i]["fshlcPhoneNumber"] != null) contentNumbers
+  if (centers[i]['rdnmadr'] != "" && centers[i]['rdnmadr'] != "null") contentAddress += "도로명주소: " + centers[i]['rdnmadr'] + "<br>";
+  if (centers[i]['lnmadr'] != "" && centers[i]['lnmadr'] != "null") contentAddress += "지번주소: " + centers[i]['lnmadr'];
+  if (centers[i]["fshlcPhoneNumber"] != "" && centers[i]["fshlcPhoneNumber"] != "null") contentNumbers += centers[i]["fshlcPhoneNumber"];
   var content =
     '<div class="wrap">' +
     '    <div class="title">낚시터 정보</div>' +
     '    <div class="body">' +
     '        <div class="desc">' +
-    '            <div class="ellipsis">' + centers[i]["fshlcNm"] + '</div>' +
-    '            <div class="jibun ellipsis">' + contentAddress + '</div>' +
-    '            <div class="jibun ellipsis">' + centers[i]["fshlcPhoneNumber"] + '</div>'
+    '            <div class="info_center">' + centers[i]["fshlcNm"] + '</div>' +
+    '            <div class="info_others">' + contentAddress + '</div>' +
+    '            <div class="info_others">' + contentNumbers + '</div>'
   "          </div>" +
     "    </div>" +
     "</div>";
