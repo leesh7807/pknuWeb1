@@ -3,7 +3,7 @@ document.cookie = 'safeCookie1=foo';
 document.cookie = 'crossCookie=bar; SameSite=None; Secure';
 
 var url = "http://api.data.go.kr/openapi/tn_pubr_public_fshlc_api";
-var queryParams = '?' + encodeURIComponent('serviceKey') + '=' + 'lS7kyucGJY1fq8UGLsP3lXJl%2FZlbc8i5ObPO9O5OHlmIjIfH9hSwPGROViGfC5rpa5KfdTDJheDcrc6lGYRw0A%3D%3D'; /*Service Key*/
+var queryParams = '?' + encodeURIComponent('serviceKey') + '=' + '[서비스키]'; /*Service Key*/
 queryParams += '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent('1'); /**/
 queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('707'); /**/
 queryParams += '&' + encodeURIComponent('type') + '=' + encodeURIComponent('json'); /**/
