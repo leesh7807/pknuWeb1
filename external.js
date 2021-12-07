@@ -17,7 +17,7 @@ function mouseOverListener(map, marker, infoWindow) {
 // 마커 마우스아웃 이벤트리스너
 function mouseOutListener(infoWindow) {
   return function () {
-    //infoWindow.close();
+    infoWindow.close();
   };
 }
 // 상세정보창 출력
@@ -121,6 +121,7 @@ function getLocationSuccess(position) {
   currentLat = position.coords.latitude;
   currentLng = position.coords.longitude;
   gpsAllow = true; //GPS 사용 가능
+
 }
 
 getLocation();
@@ -172,8 +173,9 @@ fetch(url + queryParams)
     centers = resJson.response.body.items;
     makeMarkers(centers);
     clusterer.addMarkers(markers);
-    if (gpsAllow) //사용자 위치정보를 받아왔을 시
-      map.panTo(new kakao.maps.LatLng(currentLat, currentLng)); //현재 위치로 지도 중심좌표 이동
+    if (gpsAllow) { // 사용자 위치정보를 받아왔을 시
+      map.panTo(new kakao.maps.LatLng(currentLat, currentLng)); // 현재 위치로 지도 중심좌표 이동
+    } 
     hideLoadingPage();
   });
 
