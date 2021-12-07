@@ -121,14 +121,18 @@ var url = "http://api.data.go.kr/openapi/tn_pubr_public_fshlc_api";
       });
 
     // 분류 함수
-    function classifyMarkers(e) {
+    function classifyMarkers() {
       // 셀렉트 박스에서 id로 value 가져오기.
       var target = document.getElementById("area");
       var areaValue = target.options[target.selectedIndex].value;
       var target = document.getElementById("type");
       var typeValue = target.options[target.selectedIndex].value;
-      var classifiedArea = new Array();
-      var classifiedFishingPlace = new Array(); // 분류된 fishingPlace가 저장될 json 배열.
+      // 인풋 박스의 검색할 내용 가져오기
+      var searching = document.getElementById('searchBox').value;
+      // json 배열들
+      var classifiedArea = new Array(); // 지역 분류
+      var classifiedType = new Array(); // 지역 분류 + 유형 분류
+      var fishingPlace = new Array(); // 지역 분류 + 유형 분류 + 검색
       // 전국이 선택될 때
       if (areaValue == "전국") {
         classifiedArea = centers; // 분류된 것이 곧 fishingPlace.
@@ -144,7 +148,7 @@ var url = "http://api.data.go.kr/openapi/tn_pubr_public_fshlc_api";
         }
       }
       if (typeValue == "전체") {
-        classifiedFishingPlace = classifiedArea; // 지역분류 된 결과 그대로
+        classifiedType = classifiedArea; // 지역분류 된 결과 그대로
       }
       // 그 외 유형 선택
       else {
@@ -152,15 +156,31 @@ var url = "http://api.data.go.kr/openapi/tn_pubr_public_fshlc_api";
           var type = classifiedArea[i]["fshlcType"]; // 낚시터 유형 받아오기.
           var splittedType = type.split(" "); // 스페이스바를 기준으로 배열로 저장.
           if (typeValue == splittedType[0]) {
-            classifiedFishingPlace.push(classifiedArea[i]);
+            classifiedType.push(classifiedArea[i]);
           }
+        }
+      }
+      // 검색이 카테고리에 영향을 받기에 classifyMarkers() 함수안에 포함시킴. 검색 시 버벅거리는 문제가 생김.
+      searching = searching.replace(/[^가-힣a-zA-Z0-9]/g,"") // 정규 표현식을 사용해 한글, 영어, 숫자가 아닌 것을 모두 제외.
+      searching = searching.toLowerCase(); // 영어의 경우 소문자로 통일.
+      for(var i = 0; i < classifiedType.length; i++) {
+        var searchData = classifiedType[i]["fshlcNm"]; // 검색하고 싶은 것은 searchData에 플러스해주면 됨.
+        searchData = searchData.replace(/[^가-힣a-zA-Z0-9]/g,"")
+        searchData = searchData.toLowerCase();
+        /* indexOf(value); value가 null이나 undefined인 경우 undefined를 검색해 0을 반환함. api데이터가 그렇게 되어 있는 것으로 추정.
+        value가 있을 때 검색에 성공하면 위치를 반환. 검색에 실패하면 -1을 반환. 
+        undefined가 검색되는 경우는 검색어를 전부 지웠거나, 혹은 모음이나 자음 특수문자를 검색했을 때임.
+        상기한 경우는 모든 마커를 표시해도 자연스럽다고 판단함.*/
+        var isThere = searchData.indexOf(searching);
+        if(isThere != -1) {
+          fishingPlace.push(classifiedType[i]);
         }
       }
       // 분류를 마친 후 마커를 초기화 시킴.
       clusterer.removeMarkers(markers);
       markers = [];
       // 마커를 만들어 배열에 넣고 지도에 찍기.
-      drawMarkers(classifiedFishingPlace);
+      drawMarkers(fishingPlace);
 
       clusterer.addMarkers(markers);
     }
