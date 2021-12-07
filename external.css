@@ -1,3 +1,76 @@
+body {
+  margin: 0;
+  padding: 0;
+}
+
+/* 로딩창 */
+#loading_page {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+}
+
+#loading_page::after {
+  /* 투명도 부여를 위한 가상요소 생성 */
+  background: gray;
+  content: ""; /* 가상요소 생성시 필수 속성*/
+  /* 가상 요소가 원본의 전체를 차지하도록 위치를 설정 */
+  position: absolute; /* 태그 박스의 배치를 'absolute'(절대 배치)로 지정 */
+  /* 원본의 좌측 상단 끝 모서리부터 가상 요소가 시작 */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1; /* z축 설정을 -1로 하여 원본 배경의 아래에 가상요소를 배치 */
+  opacity: 0.8; /* 투명도를 지정*/
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(359deg);
+  }
+}
+
+@keyframes text {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+#loading_icon {
+  height: 100px;
+  width: 100px;
+  border: 6px solid white;
+  border-right-color: orange;
+  border-top-color: orange;
+  border-radius: 100%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-left: -56px;
+  margin-top: -56px;
+  animation: spin 1s infinite linear;
+}
+
+#loading_text {
+  color: white;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: text 1s infinite linear;
+}
+
 /* 카테고리 */
 #area {
   position: absolute;
@@ -13,10 +86,17 @@
   z-index: 1;
 }
 
+#searchBox {
+  position: absolute;
+  top: 10px;
+  left: 160px;
+  z-index: 1;
+}
+
 /* 인포윈도우 */
 .wrap {
-  width: 288px;
-  height: 132px;
+  width: 300px;
+  height: 130px;
   text-align: left;
   overflow: hidden;
   font-size: 12px;
@@ -30,7 +110,7 @@
 }
 
 .wrap .title {
-  padding: 5px 0 0 10px;
+  padding: 5px 10px;
   height: 30px;
   background: #eee;
   border-bottom: 1px solid #ddd;
@@ -45,24 +125,18 @@
 
 .wrap .desc {
   position: relative;
-  margin: 13px 0 0 10px;
+  margin: 10px 10px;
   height: 75px;
 }
 
-.desc .ellipsis {
+.desc .info_center {
   overflow: hidden;
-  /* text-overflow: ellipsis;
-  white-space: nowrap; */
+  padding: 0 0 3px 0;
 }
 
-.desc .jibun {
+.desc .info_others {
   font-size: 11px;
   color: #888;
-  margin-top: -2px;
-}
-
-.wrap .link {
-  color: #5085bb;
 }
 
 /* 상세정보창 */
@@ -71,48 +145,48 @@
   height: 100%;
   position: absolute;
   right: 0;
-  top: 100;
+  top: 0;
   background: ivory;
   z-index: 1;
 }
 
 #detailInformation #weather {
-  height: 15%;
+  height: 25%;
   background: lawngreen;
 }
 
 #detailInformation #center_name {
-  height: 10%;
+  height: 15%;
   background: darkcyan;
   color: white;
 }
 
 #detailInformation #center_address {
-  height: 15%;
+  height: 20%;
   background: brown;
   color: white;
 }
 
 #detailInformation #center_callNumber {
-  height: 5%;
+  height: 10%;
   background: cornflowerblue;
   color: white;
 }
 
 #detailInformation #center_cost {
-  height: 5%;
+  height: 10%;
   background: darkgray;
   color: white;
 }
 
 #detailInformation #center_fishSpecies {
-  height: 5%;
+  height: 10%;
   background: darkslateblue;
   color: white;
 }
 
 #detailInformation #center_safetyFacilities {
-  height: 5%;
+  height: 10%;
   background: darkslategray;
-  color: rgb(229, 188, 188);
+  color: white;
 }

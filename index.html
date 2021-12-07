@@ -2,11 +2,16 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>공공데이터 + 카카오맵API</title>
+    <title>인터넷프로그래밍 1조</title>
     <link href="external.css" rel="stylesheet" />
   </head>
 
   <body>
+    <div id="loading_page">
+      <div id="loading_icon"></div>
+      <div id="loading_text">LOADING</div>
+    </div>
+
     <select id="area" onchange="classifyMarkers()">
       <option value="전국">전국</option>
       <option value="서울특별시">서울</option>
@@ -34,9 +39,10 @@
       <option value="평지">평지</option>
       <option value="기타">기타</option>
     </select>
-    <div id="dd" style="width: 100%; height: 13vh"></div>
-    <div id="map" style="width: 100%; height: 85vh; z-index: 0"></div>
-    <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=a84407651277ceb650e62ae21263ebec&libraries=clusterer,services"></script>
+    <input id="searchBox" type="search" onkeyup="classifyMarkers()" />
+
+    <div id="map" style="width: 100%; height: 100vh; z-index: 0"></div>
+    <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=a84407651277ceb650e62ae21263ebec&libraries=services,clusterer"></script>
     <script type="text/javascript" src="external.js"></script>
 
     <aside id="detailInformation">
