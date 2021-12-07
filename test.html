@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="demo">aa</div>
+    <script>
+        function getLocation() {
+            if (navigator.geolocation) { // GPS를 지원하면
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    alert(position.coords.latitude + ' ' + position.coords.longitude);
+                }
+                )} else {
+                alert('[경고]\n위치 정보를 받아오는 데 실패하였습니다.\n서울을 기준으로 한 지도를 표출합니다.');
+            }
+        }
+        getLocation();
+    </script>
+</body>
+
+</html>
